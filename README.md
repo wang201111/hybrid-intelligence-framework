@@ -91,12 +91,7 @@ data/
 If you use this code in your research, please cite:
 
 ```bibtex
-@article{author2025multiscale,
-  title={Multi-Scale Physical Constraints and Data Synergy Hybrid Intelligence Framework: A New Paradigm for Scientific Prediction of Multi-Component Systems Under Small-Sample Conditions},
-  author={[Authors]},
-  journal={Nature Machine Intelligence},
-  year={2025}
-}
+
 ```
 
 ## License
@@ -105,4 +100,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For questions and feedback, please contact: [email]
+For questions and feedback, please contact: [3152303762@qq.com]
