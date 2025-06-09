@@ -1,7 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15624559.svg)](https://doi.org/10.5281/zenodo.15624559)
 
 # Multi-Scale Physical Constraints and Data Synergy Hybrid Intelligence Framework
-# Multi-Scale Physical Constraints and Data Synergy Hybrid Intelligence Framework
 
 This repository contains the implementation of the hybrid intelligence framework proposed in our paper "Multi-Scale Physical Constraints and Data Synergy Hybrid Intelligence Framework: A New Paradigm for Scientific Prediction of Multi-Component Systems Under Small-Sample Conditions".
 
