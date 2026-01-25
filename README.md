@@ -27,39 +27,62 @@ Unlike traditional PINNs that require explicit governing equations, this framewo
 - Robust performance under data scarcity and noise contamination
 - Modular design allowing independent evaluation of each component
 
-## Installation
+## System Requirements
 
 ### Prerequisites
 
 - Python 3.8 or higher
 - CUDA-compatible GPU (recommended for faster training)
 
+### Tested Environments
+
+**Operating Systems:**
+- Ubuntu 20.04 / 22.04 LTS
+- Windows 10/11
+- macOS 12+ (CPU only, no CUDA support)
+
+**Python Versions:**
+- Python 3.8, 3.9, 3.10 (recommended: 3.9)
+
+**GPU/CUDA:**
+- NVIDIA RTX 4070 Super (tested)
+- NVIDIA RTX 3080 (tested)
+- CUDA 11.7 / 11.8
+- cuDNN 8.5+
+
+**Note**: CPU-only mode is supported but significantly slower (~10x).
+
+## Installation
+
 ### Setup
 
 Clone the repository:
-
 ```bash
 git clone https://github.com/wang201111/hybrid-intelligence-framework.git
 cd hybrid-intelligence-framework
 ```
 
 Create a virtual environment:
-
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 Install dependencies:
-
 ```bash
 pip install -r requirements.txt
 ```
 
+### Installation Time
+
+On a typical desktop computer with stable internet:
+- **Dependencies installation**: ~5-10 minutes (via pip)
+- **Data download**: Included in repository (~50 MB)
+- **Total setup time**: ~10-15 minutes
+
 ## Quick Start
 
 ### Solubility Prediction Example
-
 ```python
 from src.solubility_pipeline import SolubilityPipeline
 
@@ -82,7 +105,6 @@ print(f"Boundary Consistency: {results['boundary_consistency']:.3f}")
 ```
 
 ### Viscosity Prediction Example
-
 ```python
 from src.viscosity_pipeline import ViscosityPipeline
 
@@ -104,34 +126,129 @@ print(f"Test R2: {results['test_r2']:.3f}")
 print(f"Physical Rationality: {results['physics_score']:.3f}")
 ```
 
+## How to Run
+
+All experiments are standalone Python scripts that can be executed directly from the project root.
+
+### Quick Start
+
+Run a single experiment:
+```bash
+# Ablation study - Complete Model (M4 pipeline)
+python experiments/solubility/ablation/Complete_Model_experiment.py
+
+# Ablation study - Baseline
+python experiments/solubility/ablation/baseline_experiment.py
+```
+
+### Ablation Studies
+
+Compare the contribution of each module:
+```bash
+cd experiments/solubility/ablation
+
+python baseline_experiment.py              # Baseline DNN
+python T_KMeans_LOF_experiment.py          # + Data cleaning
+python IADAF_experiment.py                 # + Data augmentation
+python LDPC_experiment.py                  # + Physical constraints
+python Complete_Model_experiment.py        # All modules combined
+```
+
+**Runtime**: ~5 minutes each (Complete Model: ~40 minutes)
+
+### Small-Sample Robustness Tests
+
+Evaluate performance with reduced training data (10%, 25%, 50%, 75%, 100%):
+```bash
+cd experiments/solubility/small_sample
+
+python small_sample_baseline_experiment.py
+python small_sample_T_KMeans_LOF_experiment.py
+python small_sample_IADAF_experiment.py
+python small_sample_LDPC_experiment.py
+python small_sample_Complete_Model_experiment.py
+```
+
+**Runtime**: ~30 minutes each (Complete Model: ~8 hours)
+
+### Noise Robustness Tests
+
+Test tolerance to measurement errors (0%, 5%, 10%, 15%, 20% noise):
+```bash
+cd experiments/solubility/noise
+
+python noise_robustness_baseline_experiment.py
+python noise_robustness_T_KMeans_LOF_experiment.py
+python noise_robustness_IADAF_experiment.py
+python noise_robustness_LDPC_experiment.py
+python noise_robustness_Complete_Model_experiment.py
+```
+
+**Runtime**: ~30 minutes each (Complete Model: ~8 hours)
+
+### Viscosity System
+
+Cross-validation experiments on transport properties:
+```bash
+cd experiments/viscosity/ablation
+
+python baseline_experiment.py              # Baseline
+python Complete_Model_experiment.py        # Complete M4 pipeline
+```
+
+### Run All Experiments
+```bash
+# Run complete experimental suite (solubility only)
+cd experiments/solubility
+
+# Ablation studies (~1 hour)
+for script in ablation/*.py; do python "$script"; done
+
+# Small-sample tests (~10 hours)
+for script in small_sample/*.py; do python "$script"; done
+
+# Noise robustness tests (~10 hours)
+for script in noise/*.py; do python "$script"; done
+```
+
 ## Reproducing Paper Results
 
 ### Main Results (Table 2)
 
-Run the complete framework experiments:
+Expected results for **KCl-MgCl2-H2O** system:
 
+| Model | Test R² | Test RMSE | Physics Score |
+|:------|:--------|:----------|:--------------|
+| Baseline | 0.572 ± 0.313 | 8.833 ± 3.460 | 0.612 ± 0.123 |
+| Complete Model | 0.873 ± 0.015 | 5.090 ± 0.304 | 0.978 ± 0.002 |
+
+**Training Range**: -34°C to 100°C (484 points)  
+**Testing Range**: 100°C to 227°C (135 points, high-temperature extrapolation)
+
+**Run commands:**
 ```bash
-# Solubility systems
-python experiments/solubility/ablation/Complete_Model_experiment.py
+# Baseline
+python experiments/solubility/ablation/baseline_experiment.py
 
-# Viscosity system
-python experiments/viscosity/ablation/Complete_Model_experiment.py
+# Complete Model
+python experiments/solubility/ablation/Complete_Model_experiment.py
 ```
 
-Expected output for KCl-MgCl2-H2O system:
+**Expected output:**
 ```
 Training: -34°C to 100°C (484 points)
 Testing: 100°C to 227°C (135 points)
 ==========================================
-Baseline Model Test R2: 0.572 ± 0.313
-Complete Model Test R2: 0.873 ± 0.015
+Baseline Model Test R²: 0.572 ± 0.313
+Complete Model Test R²: 0.873 ± 0.015
 Improvement: +0.301
 ```
+
+**Verification:** Results should match within ±0.02 for R² due to random initialization.
 
 ### Ablation Studies (Table 3 and Figure 5)
 
 Run all five experimental configurations:
-
 ```bash
 cd experiments/solubility/ablation
 
@@ -151,12 +268,13 @@ python LDPC_experiment.py
 python Complete_Model_experiment.py
 ```
 
-Runtime: Approximately 30 minutes per experiment on a standard desktop with GPU.
+**Runtime**: Approximately 30 minutes per experiment (except Complete Model: ~40 minutes).
+
+**Compare results:** Check `results/solubility/ablation/*/summary/summary_metrics.xlsx`
 
 ### Small-Sample Robustness Tests
 
 Test framework performance with reduced training data:
-
 ```bash
 cd experiments/solubility/small_sample
 
@@ -167,12 +285,15 @@ python small_sample_LDPC_experiment.py
 python small_sample_Complete_Model_experiment.py
 ```
 
+**Expected behavior:**
+- Complete Model maintains Test R² > 0.4 even at 10% data (32 samples)
+- Baseline Model drops to Test R² < -1.0 at 10% data
+
 These experiments evaluate performance at 10%, 25%, 50%, 75%, and 100% of training data.
 
 ### Noise Robustness Tests
 
 Test framework tolerance to measurement errors:
-
 ```bash
 cd experiments/solubility/noise
 
@@ -183,10 +304,45 @@ python noise_robustness_LDPC_experiment.py
 python noise_robustness_Complete_Model_experiment.py
 ```
 
+**Expected behavior:**
+- Complete Model maintains Test R² > 0.7 even at 20% noise
+- Baseline Model drops to Test R² < -10.0 at 20% noise
+
 These experiments inject Gaussian noise at 5%, 10%, 15%, and 20% levels.
 
-## Repository Structure
+## Results Organization
 
+Each experiment uses 5-fold cross-validation. Results are organized as follows:
+```bash
+results/solubility/ablation/Complete_Model_results/
+├── fold_0/
+│   ├── excel/
+│   │   ├── complete_metrics.xlsx              # Metrics: R², RMSE, MAE, physics scores
+│   │   └── complete_*_predictions.xlsx        # Predictions for train/val/test sets
+│   ├── configs/experiment_config.json         # Hyperparameters & random seeds
+│   └── models/complete_model.pth              # Trained PyTorch model
+├── fold_1/ ... fold_4/                         # Additional folds (same structure)
+└── summary/
+    ├── summary_metrics.xlsx                    # Aggregated: mean ± std across folds
+    ├── test_predictions_summary.xlsx           # Combined predictions from all folds
+    └── summary_report.txt                      # Full experimental report
+```
+
+### Output Files by Experiment
+
+| Experiment | File Prefix | Example |
+|:-----------|:------------|:--------|
+| Baseline | `baseline_` | `baseline_metrics.xlsx` |
+| T-KMeans-LOF | `cleaning_` | `cleaning_metrics.xlsx` |
+| IADAF | `iadaf_` | `iadaf_metrics.xlsx` |
+| LDPC | `ldpc_` | `ldpc_metrics.xlsx` |
+| Complete Model | `complete_` | `complete_metrics.xlsx` |
+
+**Key Metrics** (in `summary_metrics.xlsx`):
+- Statistical: Train/Val/Test R², RMSE, MAE
+- Physics: Overall Score, Boundary Consistency, Thermodynamic Smoothness
+
+## Repository Structure
 ```
 physics-informed-ml-framework/
 │
@@ -365,13 +521,13 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 
 **raw/**: Original experimental data from literature
 
-**cleaned/**: Data after T-KMeans-LOF outlier detection, demonstrating the effect of data quality control
+**cleaned/**: Data after T-KMeans-LOF outlier detection
 
 **split_by_temperature/**: Temperature-based train/test splits
 - Low-temperature data: Used for k-fold cross-validation during training
 - High-temperature data: Reserved for evaluating extrapolation capability
 
-**fixed_splits/**: Fixed train/val/test splits for KCl-MgCl2-H2O system, enabling direct comparison across model configurations
+**fixed_splits/**: Fixed train/val/test splits for noise and small-sample experiments
 
 ### Data Format
 
@@ -387,57 +543,6 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 - x1 (mole fraction of component 1)
 - x2 (mole fraction of component 2)
 - Viscosity (mPa·s, target variable)
-
-## Experimental Design
-
-### Ablation Studies
-
-Five experimental configurations evaluate the independent contributions and synergistic effects of each module:
-
-**Experiment 1: Baseline Model**
-- Standard DNN trained on raw data
-- No outlier detection, no augmentation, no physical constraints
-- Establishes baseline performance
-
-**Experiment 2: T-KMeans-LOF**
-- Outlier detection applied to raw data
-- Standard DNN trained on cleaned data
-- Evaluates impact of data quality control
-
-**Experiment 3: IADAF**
-- Data augmentation applied to raw data
-- Standard DNN trained on augmented data
-- Evaluates impact of synthetic data generation
-
-**Experiment 4: LDPC**
-- Standard DNN trained on raw data
-- Physical constraints applied during inference
-- Evaluates impact of boundary consistency enforcement
-
-**Experiment 5: Complete Model**
-- Sequential integration of all three modules
-- Raw data → T-KMeans-LOF cleaning → IADAF augmentation → DNN training → LDPC constraint correction
-- Demonstrates synergistic effects
-
-### Small-Sample Robustness Tests
-
-Evaluates framework performance under data scarcity:
-
-- Temperature-stratified sampling at five gradients: 10%, 25%, 50%, 75%, 100%
-- Sample sizes range from 32 to 320 datapoints
-- 20 independent sampling realizations per gradient
-- Tests data efficiency and degradation patterns
-
-### Noise Robustness Tests
-
-Evaluates framework tolerance to measurement errors:
-
-- Gaussian noise injection at five levels: 0%, 5%, 10%, 15%, 20%
-- Noise applied to target variable in training set
-- 20 independent noise realizations per level
-- Tests outlier detection effectiveness and stability
-
-All experiments use a fixed high-temperature test set (T > 100°C, 135 datapoints) to ensure consistent evaluation conditions.
 
 ## Framework Components
 
@@ -468,7 +573,7 @@ Iterative adaptive data augmentation using WGAN-GP with Bayesian optimization.
 - WGAN-GP generates synthetic samples with Wasserstein distance and gradient penalty
 - Bayesian optimization automatically tunes hyperparameters for each system
 - XGBoost discriminator filters generated samples for quality control
-- DNN validation R2 serves as ultimate quality evaluator
+- DNN validation R² serves as ultimate quality evaluator
 
 **Optimized hyperparameters**:
 - latent_dim: Latent space dimensionality (range: 1-100)
@@ -495,31 +600,11 @@ Low-dimensional physical constraints based on topological continuity of macrosco
 - decay_rate: Controls extent of boundary correction (default: k=2)
 - Binary models: Ensemble learning with Bootstrap sampling
 
-## Core Module Files
-
-**binary_predictor.py**: Binary boundary prediction models for LDPC physical constraints, supporting ensemble learning and GPU acceleration
-
-**t_kmeans_lof.py**: Temperature-guided outlier detection combining K-means clustering, LOF density analysis, and RMM trend analysis
-
-**iadaf.py**: Adaptive data augmentation with WGAN-GP, Bayesian hyperparameter optimization, and TSTR quality evaluation
-
-**ldpc_solubility.py**: Physical constraints for solubility prediction using conforming correction method with two-boundary enforcement
-
-**ldpc_viscosity.py**: Physical constraints for viscosity prediction using edge sampling correction method with three-boundary enforcement
-
-**solubility_pipeline.py**: End-to-end workflow integrating all modules for solubility systems, supporting 5-fold cross-validation
-
-**viscosity_pipeline.py**: End-to-end workflow integrating all modules for viscosity systems, supporting PARL-DNN architecture
-
-**utils_solubility.py**: Physics evaluation for solubility, including boundary consistency (2 boundaries) and thermodynamic smoothness (2D Laplacian)
-
-**utils_viscosity.py**: Physics evaluation for viscosity, including boundary consistency (3 boundaries) and thermodynamic smoothness (4D Laplacian)
-
 ## Performance Metrics
 
 ### Statistical Metrics
 
-- **R2 (Coefficient of Determination)**: Model fit quality
+- **R² (Coefficient of Determination)**: Model fit quality
 - **RMSE (Root Mean Square Error)**: Prediction accuracy
 - **MAE (Mean Absolute Error)**: Average deviation
 
@@ -555,79 +640,41 @@ All dependencies are pinned to exact versions to ensure reproducibility.
 ### Hardware
 
 - **Minimum**: CPU with 8GB RAM
-- **Recommended**: NVIDIA GPU with CUDA support and 16GB RAM
+- **Recommended**: NVIDIA GPU with CUDA support and 16GB+ RAM
 - **Storage**: Approximately 2 GB for code, data, and results
 
 ### Runtime
 
-Approximate execution times on Intel i7 CPU with NVIDIA RTX 3080 GPU:
+Approximate execution times on **Intel i5-13600KF CPU** with **NVIDIA RTX 4070 Super GPU** and **32GB RAM**:
 
-- Single ablation experiment: 30 minutes
-- All solubility ablation studies (5 configurations): 2.5 hours
-- Small-sample robustness tests: 2 hours
-- Noise robustness tests: 2 hours
-- Complete experimental suite: 8-10 hours
+#### Ablation Studies
+| Experiment | Runtime |
+|:-----------|:--------|
+| Single configuration (non-Complete) | ~5 minutes |
+| Complete Model (M4 pipeline) | ~40 minutes |
+| All 5 ablation configurations | ~1 hour |
 
-## Results Organization
+#### Robustness Tests
+| Test Type | Single Configuration | Complete Model (M4) |
+|:----------|:--------------------|:--------------------|
+| Small-sample robustness | ~30 minutes | ~8 hours |
+| Noise robustness | ~30 minutes | ~8 hours |
 
-Each experiment automatically saves results to the results/ directory:
+#### Full Experimental Suite
+- **Ablation studies** (5 configurations): ~1 hour
+- **Small-sample tests** (5 configurations × 5 gradients): ~10 hours
+- **Noise tests** (5 configurations × 5 levels): ~10 hours
+- **Total**: ~21 hours
 
-**Per experiment output**:
-- metrics.csv: Performance metrics (R2, MAE, RMSE, physics scores)
-- predictions.csv: Model predictions on test set
-- config.json: Experimental configuration
-- training_history.csv: Loss curves during training
-- physics_scores.csv: Physical consistency evaluations
-
-**Example structure**:
-```
-results/solubility/ablation/Complete_Model_results/
-├── metrics.csv
-├── predictions.csv
-├── config.json
-├── training_history.csv
-└── physics_scores.csv
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: CUDA out of memory
-
-**Solution**: Reduce batch size or use CPU mode:
-```python
-pipeline = SolubilityPipeline(device='cpu')
-```
-
-**Issue**: Excel file reading error
-
-**Solution**: Install or upgrade openpyxl:
-```bash
-pip install openpyxl --upgrade
-```
-
-**Issue**: Results differ from paper
-
-**Solution**: Ensure exact dependency versions:
-```bash
-pip install -r requirements.txt --force-reinstall
-```
-
-**Issue**: Long training time
-
-**Solution**: Reduce epochs for testing or enable early stopping:
-```python
-pipeline = SolubilityPipeline(
-    max_epochs=500,
-    early_stopping=True
-)
-```
+> **Note**: Runtime varies based on:
+> - Number of K-fold iterations (default: 5)
+> - Number of repeats for robustness tests (default: 10-20)
+> - IADAF Bayesian optimization iterations (default: 100)
+> - Early stopping in DNN training
 
 ## Citation
 
 If you use this code in your research, please cite:
-
 ```bibtex
 @article{wang2024physics,
   title={Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data},
