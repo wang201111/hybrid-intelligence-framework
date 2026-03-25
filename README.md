@@ -1,4 +1,4 @@
-# Physics-Constrained Multi-Module Machine Learning Framework for Solubility Prediction from Small-Sample Experimental Data
+# Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15624558.svg)](https://doi.org/10.5281/zenodo.15624558)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -7,7 +7,7 @@
 
 This repository contains the complete implementation of the framework described in the paper:
 
-**"Physics-Constrained Multi-Module Machine Learning Framework for Solubility Prediction from Small-Sample Experimental Data"**
+**"Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data"**
 
 *Submitted to Nature Communications*
 
@@ -23,6 +23,7 @@ Unlike traditional PINNs that require explicit governing equations, this framewo
 
 - High-temperature extrapolation from limited training data
 - Physics-informed constraints without explicit differential equations
+- Transferable across different property types (equilibrium and transport properties)
 - Robust performance under data scarcity and noise contamination
 - Modular design allowing independent evaluation of each component
 
@@ -57,8 +58,8 @@ Unlike traditional PINNs that require explicit governing equations, this framewo
 
 Clone the repository:
 ```bash
-git clone https://github.com/wang201111/physics-constrained-solubility-framework.git
-cd physics-constrained-solubility-framework
+git clone https://github.com/wang201111/hybrid-intelligence-framework.git
+cd hybrid-intelligence-framework
 ```
 
 Create a virtual environment:
@@ -81,6 +82,7 @@ On a typical desktop computer with stable internet:
 
 ## Quick Start
 
+### Solubility Prediction Example
 ```python
 from src.solubility_pipeline import SolubilityPipeline
 
@@ -100,6 +102,28 @@ results = pipeline.run()
 
 print(f"Test R2: {results['test_r2']:.3f}")
 print(f"Boundary Consistency: {results['boundary_consistency']:.3f}")
+```
+
+### Viscosity Prediction Example
+```python
+from src.viscosity_pipeline import ViscosityPipeline
+
+# Initialize complete framework
+pipeline = ViscosityPipeline(
+    system_name='MCH-cis-Decalin-HMN',
+    use_outlier_detection=True,
+    use_augmentation=True,
+    use_physical_constraints=True
+)
+
+# Load data
+pipeline.load_data('data/viscosity/raw/ternary/MCH_cis_Decalin_HMN.xlsx')
+
+# Run workflow
+results = pipeline.run()
+
+print(f"Test R2: {results['test_r2']:.3f}")
+print(f"Physical Rationality: {results['physics_score']:.3f}")
 ```
 
 ## How to Run
@@ -162,8 +186,19 @@ python noise_robustness_Complete_Model_experiment.py
 
 **Runtime**: ~30 minutes each (Complete Model: ~8 hours)
 
+### Viscosity System
+
+Cross-validation experiments on transport properties:
+```bash
+cd experiments/viscosity/ablation
+
+python baseline_experiment.py              # Baseline
+python Complete_Model_experiment.py        # Complete M4 pipeline
+```
+
 ### Run All Experiments
 ```bash
+# Run complete experimental suite (solubility only)
 cd experiments/solubility
 
 # Ablation studies (~1 hour)
@@ -192,7 +227,10 @@ Expected results for **KCl-MgCl2-H2O** system:
 
 **Run commands:**
 ```bash
+# Baseline
 python experiments/solubility/ablation/baseline_experiment.py
+
+# Complete Model
 python experiments/solubility/ablation/Complete_Model_experiment.py
 ```
 
@@ -214,11 +252,20 @@ Run all five experimental configurations:
 ```bash
 cd experiments/solubility/ablation
 
-python baseline_experiment.py          # Experiment 1: Baseline (pure DNN on raw data)
-python T_KMeans_LOF_experiment.py      # Experiment 2: Data cleaning only
-python IADAF_experiment.py             # Experiment 3: Data augmentation only
-python LDPC_experiment.py              # Experiment 4: Physical constraints only
-python Complete_Model_experiment.py    # Experiment 5: Complete framework (all modules)
+# Experiment 1: Baseline (pure DNN on raw data)
+python baseline_experiment.py
+
+# Experiment 2: Data cleaning only
+python T_KMeans_LOF_experiment.py
+
+# Experiment 3: Data augmentation only
+python IADAF_experiment.py
+
+# Experiment 4: Physical constraints only
+python LDPC_experiment.py
+
+# Experiment 5: Complete framework (all modules)
+python Complete_Model_experiment.py
 ```
 
 **Runtime**: Approximately 30 minutes per experiment (except Complete Model: ~40 minutes).
@@ -242,6 +289,8 @@ python small_sample_Complete_Model_experiment.py
 - Complete Model maintains Test R² > 0.4 even at 10% data (32 samples)
 - Baseline Model drops to Test R² < -1.0 at 10% data
 
+These experiments evaluate performance at 10%, 25%, 50%, 75%, and 100% of training data.
+
 ### Noise Robustness Tests
 
 Test framework tolerance to measurement errors:
@@ -259,10 +308,12 @@ python noise_robustness_Complete_Model_experiment.py
 - Complete Model maintains Test R² > 0.7 even at 20% noise
 - Baseline Model drops to Test R² < -10.0 at 20% noise
 
+These experiments inject Gaussian noise at 5%, 10%, 15%, and 20% levels.
+
 ## Results Organization
 
 Each experiment uses 5-fold cross-validation. Results are organized as follows:
-```
+```bash
 results/solubility/ablation/Complete_Model_results/
 ├── fold_0/
 │   ├── excel/
@@ -292,7 +343,6 @@ results/solubility/ablation/Complete_Model_results/
 - Physics: Overall Score, Boundary Consistency, Thermodynamic Smoothness
 
 ## Repository Structure
-
 ```
 physics-informed-ml-framework/
 │
@@ -300,31 +350,49 @@ physics-informed-ml-framework/
 ├── requirements.txt
 │
 ├── data/
-│   └── solubility/
+│   │
+│   ├── solubility/
+│   │   ├── raw/
+│   │   │   ├── ternary/
+│   │   │   │   ├── KCl_MgCl2_H2O.xlsx
+│   │   │   │   ├── NaCl_KCl_H2O.xlsx
+│   │   │   │   └── NaCl_MgCl2_H2O.xlsx
+│   │   │   └── binary/
+│   │   │       ├── KCl_H2O.xlsx
+│   │   │       ├── MgCl2_H2O.xlsx
+│   │   │       └── NaCl_H2O.xlsx
+│   │   │
+│   │   ├── cleaned/
+│   │   │   ├── KCl_MgCl2_H2O_cleaned.xlsx
+│   │   │   ├── NaCl_KCl_H2O_cleaned.xlsx
+│   │   │   └── NaCl_MgCl2_H2O_cleaned.xlsx
+│   │   │
+│   │   ├── split_by_temperature/
+│   │   │   ├── KCl_MgCl2_H2O_low_temp.xlsx
+│   │   │   ├── KCl_MgCl2_H2O_high_temp.xlsx
+│   │   │   ├── NaCl_KCl_H2O_low_temp.xlsx
+│   │   │   ├── NaCl_KCl_H2O_high_temp.xlsx
+│   │   │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
+│   │   │   └── NaCl_MgCl2_H2O_high_temp.xlsx
+│   │   │
+│   │   └── fixed_splits/
+│   │       ├── train.xlsx
+│   │       ├── val.xlsx
+│   │       └── test.xlsx
+│   │
+│   └── viscosity/
 │       ├── raw/
 │       │   ├── ternary/
-│       │   │   ├── KCl_MgCl2_H2O.xlsx
-│       │   │   ├── NaCl_KCl_H2O.xlsx
-│       │   │   └── NaCl_MgCl2_H2O.xlsx
+│       │   │   └── MCH_cis_Decalin_HMN.xlsx
 │       │   └── binary/
-│       │       ├── KCl_H2O.xlsx
-│       │       ├── MgCl2_H2O.xlsx
-│       │       └── NaCl_H2O.xlsx
+│       │       ├── MCH_cis_Decalin.xlsx
+│       │       ├── MCH_HMN.xlsx
+│       │       └── cis_Decalin_HMN.xlsx
 │       ├── cleaned/
-│       │   ├── KCl_MgCl2_H2O_cleaned.xlsx
-│       │   ├── NaCl_KCl_H2O_cleaned.xlsx
-│       │   └── NaCl_MgCl2_H2O_cleaned.xlsx
-│       ├── split_by_temperature/
-│       │   ├── KCl_MgCl2_H2O_low_temp.xlsx
-│       │   ├── KCl_MgCl2_H2O_high_temp.xlsx
-│       │   ├── NaCl_KCl_H2O_low_temp.xlsx
-│       │   ├── NaCl_KCl_H2O_high_temp.xlsx
-│       │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
-│       │   └── NaCl_MgCl2_H2O_high_temp.xlsx
-│       └── fixed_splits/
-│           ├── train.xlsx
-│           ├── val.xlsx
-│           └── test.xlsx
+│       │   └── MCH_cis_Decalin_HMN_cleaned.xlsx
+│       └── split_by_temperature/
+│           ├── low_temp.xlsx
+│           └── high_temp.xlsx
 │
 ├── src/
 │   ├── __init__.py
@@ -332,61 +400,88 @@ physics-informed-ml-framework/
 │   ├── t_kmeans_lof.py
 │   ├── iadaf.py
 │   ├── ldpc_solubility.py
+│   ├── ldpc_viscosity.py
 │   ├── solubility_pipeline.py
-│   └── utils_solubility.py
+│   ├── viscosity_pipeline.py
+│   ├── utils_solubility.py
+│   └── utils_viscosity.py
 │
 ├── models/
-│   └── solubility/
+│   ├── solubility/
+│   │   └── binary/
+│   │       ├── KCl_H2O.pth
+│   │       ├── MgCl2_H2O.pth
+│   │       └── NaCl_H2O.pth
+│   │
+│   └── viscosity/
 │       └── binary/
-│           ├── KCl_H2O.pth
-│           ├── MgCl2_H2O.pth
-│           └── NaCl_H2O.pth
+│           ├── cis_Decalin_HMN.pth
+│           ├── MCH_cis_Decalin.pth
+│           └── MCH_HMN.pth
 │
 ├── experiments/
-│   └── solubility/
+│   │
+│   ├── solubility/
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── ablation/
+│   │   │   ├── __init__.py
+│   │   │   ├── baseline_experiment.py
+│   │   │   ├── T_KMeans_LOF_experiment.py
+│   │   │   ├── IADAF_experiment.py
+│   │   │   ├── LDPC_experiment.py
+│   │   │   └── Complete_Model_experiment.py
+│   │   │
+│   │   ├── small_sample/
+│   │   │   ├── __init__.py
+│   │   │   ├── small_sample_baseline_experiment.py
+│   │   │   ├── small_sample_T_KMeans_LOF_experiment.py
+│   │   │   ├── small_sample_IADAF_experiment.py
+│   │   │   ├── small_sample_LDPC_experiment.py
+│   │   │   └── small_sample_Complete_Model_experiment.py
+│   │   │
+│   │   └── noise/
+│   │       ├── __init__.py
+│   │       ├── noise_robustness_baseline_experiment.py
+│   │       ├── noise_robustness_T_KMeans_LOF_experiment.py
+│   │       ├── noise_robustness_IADAF_experiment.py
+│   │       ├── noise_robustness_LDPC_experiment.py
+│   │       └── noise_robustness_Complete_Model_experiment.py
+│   │
+│   └── viscosity/
 │       ├── __init__.py
-│       ├── ablation/
-│       │   ├── __init__.py
-│       │   ├── baseline_experiment.py
-│       │   ├── T_KMeans_LOF_experiment.py
-│       │   ├── IADAF_experiment.py
-│       │   ├── LDPC_experiment.py
-│       │   └── Complete_Model_experiment.py
-│       ├── small_sample/
-│       │   ├── __init__.py
-│       │   ├── small_sample_baseline_experiment.py
-│       │   ├── small_sample_T_KMeans_LOF_experiment.py
-│       │   ├── small_sample_IADAF_experiment.py
-│       │   ├── small_sample_LDPC_experiment.py
-│       │   └── small_sample_Complete_Model_experiment.py
-│       └── noise/
+│       └── ablation/
 │           ├── __init__.py
-│           ├── noise_robustness_baseline_experiment.py
-│           ├── noise_robustness_T_KMeans_LOF_experiment.py
-│           ├── noise_robustness_IADAF_experiment.py
-│           ├── noise_robustness_LDPC_experiment.py
-│           └── noise_robustness_Complete_Model_experiment.py
+│           ├── baseline_experiment.py
+│           └── Complete_Model_experiment.py
 │
 └── results/
-    └── solubility/
-        ├── ablation/
-        │   ├── baseline_results/
-        │   ├── T_KMeans_LOF_results/
-        │   ├── IADAF_results/
-        │   ├── LDPC_results/
-        │   └── Complete_Model_results/
-        ├── small_sample/
-        │   ├── small_sample_baseline_results/
-        │   ├── small_sample_T_KMeans_LOF_results/
-        │   ├── small_sample_IADAF_results/
-        │   ├── small_sample_LDPC_results/
-        │   └── small_sample_Complete_Model_results/
-        └── noise/
-            ├── noise_robustness_baseline_results/
-            ├── noise_robustness_T_KMeans_LOF_results/
-            ├── noise_robustness_IADAF_results/
-            ├── noise_robustness_LDPC_results/
-            └── noise_robustness_Complete_Model_results/
+    ├── solubility/
+    │   ├── ablation/
+    │   │   ├── baseline_results/
+    │   │   ├── T_KMeans_LOF_results/
+    │   │   ├── IADAF_results/
+    │   │   ├── LDPC_results/
+    │   │   └── Complete_Model_results/
+    │   │
+    │   ├── small_sample/
+    │   │   ├── small_sample_baseline_results/
+    │   │   ├── small_sample_T_KMeans_LOF_results/
+    │   │   ├── small_sample_IADAF_results/
+    │   │   ├── small_sample_LDPC_results/
+    │   │   └── small_sample_Complete_Model_results/
+    │   │
+    │   └── noise/
+    │       ├── noise_robustness_baseline_results/
+    │       ├── noise_robustness_T_KMeans_LOF_results/
+    │       ├── noise_robustness_IADAF_results/
+    │       ├── noise_robustness_LDPC_results/
+    │       └── noise_robustness_Complete_Model_results/
+    │
+    └── viscosity/
+        └── ablation/
+            ├── baseline_results/
+            └── Complete_Model_results/
 ```
 
 ## Data Description
@@ -413,6 +508,15 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 - Training: -35°C to 100°C (244 points)
 - Testing: 100°C to 200°C (69 points, high-temperature extrapolation)
 
+### Viscosity System
+
+**MCH-cis-Decalin-HMN** (Methylcyclohexane-cis-Decalin-Heptamethylnonane)
+- Temperature range: 20-80°C
+- Pressure range: 0.1-100 MPa
+- Total datapoints: 546
+- Training: 20-40°C (136 points)
+- Testing: 40-80°C (387 points, high-temperature extrapolation)
+
 ### Data Organization
 
 **raw/**: Original experimental data from literature
@@ -433,13 +537,20 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 - Component 2 mass fraction (%)
 - Solubility (target variable)
 
+**Viscosity data** (Excel format):
+- Temperature (°C)
+- Pressure (MPa)
+- x1 (mole fraction of component 1)
+- x2 (mole fraction of component 2)
+- Viscosity (mPa·s, target variable)
+
 ## Framework Components
 
 ### Module 1: T-KMeans-LOF
 
 Temperature-guided outlier detection based on the thermodynamic stability principle.
 
-**Key principle**: Equilibrium properties must vary smoothly with state parameters due to analyticity of microscopic interaction potentials and Cahn-Hilliard energy minimization.
+**Key principle**: Equilibrium and transport properties must vary smoothly with state parameters due to analyticity of microscopic interaction potentials and Cahn-Hilliard energy minimization.
 
 **Methodology**:
 - K-means clustering stratifies data into near-isothermal layers
@@ -448,9 +559,9 @@ Temperature-guided outlier detection based on the thermodynamic stability princi
 - Consensus scoring combines both methods to balance detection sensitivity
 
 **Key parameters**:
-- `contamination`: Expected proportion of outliers (default: 0.2)
-- `n_clusters`: Number of temperature clusters (default: determined by silhouette analysis)
-- `n_neighbors`: LOF neighbors parameter (default: 5)
+- contamination: Expected proportion of outliers (default: 0.2)
+- n_clusters: Number of temperature clusters (default: determined by silhouette analysis)
+- n_neighbors: LOF neighbors parameter (default: 5)
 
 ### Module 2: IADAF
 
@@ -465,9 +576,9 @@ Iterative adaptive data augmentation using WGAN-GP with Bayesian optimization.
 - DNN validation R² serves as ultimate quality evaluator
 
 **Optimized hyperparameters**:
-- `latent_dim`: Latent space dimensionality (range: 1–100)
-- `hidden_dim`: Hidden layer dimensionality (range: 150–350)
-- `lambda_gp`: Gradient penalty coefficient (range: 0.05–5.0)
+- latent_dim: Latent space dimensionality (range: 1-100)
+- hidden_dim: Hidden layer dimensionality (range: 150-350)
+- lambda_gp: Gradient penalty coefficient (range: 0.05-5.0)
 
 ### Module 3: LDPC
 
@@ -481,10 +592,12 @@ Low-dimensional physical constraints based on topological continuity of macrosco
 - Exponential decay weighting ensures boundary accuracy while preserving interior predictions
 - Boundary constraints propagate to interior points through interpolation
 
-**Solubility systems**: Two binary boundaries (Component 1–Water, Component 2–Water)
+**Solubility systems**: Two binary boundaries (Component 1-Water, Component 2-Water)
+
+**Viscosity systems**: Three binary boundaries (MCH=0, Decalin=0, HMN=0)
 
 **Key parameters**:
-- `decay_rate`: Controls extent of boundary correction (default: k=2)
+- decay_rate: Controls extent of boundary correction (default: k=2)
 - Binary models: Ensemble learning with Bootstrap sampling
 
 ## Performance Metrics
@@ -497,15 +610,20 @@ Low-dimensional physical constraints based on topological continuity of macrosco
 
 ### Physics-Based Metrics
 
-**Physical Rationality**: Overall compliance with thermodynamic laws (mean of Boundary Consistency and Thermodynamic Smoothness)
+**Physical Rationality**: Overall compliance with thermodynamic laws
+- Calculated as mean of Boundary Consistency and Thermodynamic Smoothness
 
-**Boundary Consistency**: Convergence accuracy to binary subsystem boundaries, measured using normalized RMSE at compositional limits (w(Component) = 0)
+**Boundary Consistency**: Convergence accuracy to binary subsystem boundaries
+- Measured using normalized RMSE at compositional limits
+- Evaluates system degeneracy at w(Component) = 0
 
-**Thermodynamic Smoothness**: Surface continuity based on Cahn-Hilliard theory, quantified via P99 quantile of extreme Laplacian values to penalize non-physical oscillations
+**Thermodynamic Smoothness**: Surface continuity based on Cahn-Hilliard theory
+- Quantifies extreme Laplacian values using P99 quantile method
+- Penalizes non-physical oscillations violating energy minimization
 
 ## Key Dependencies
 
-Core packages with exact versions specified in `requirements.txt`:
+Core packages with exact versions specified in requirements.txt:
 
 - PyTorch 1.12.0 (deep learning framework)
 - NumPy 1.21.0 (numerical computing)
@@ -523,14 +641,13 @@ All dependencies are pinned to exact versions to ensure reproducibility.
 
 - **Minimum**: CPU with 8GB RAM
 - **Recommended**: NVIDIA GPU with CUDA support and 16GB+ RAM
-- **Storage**: Approximately 1 GB for code, data, and results
+- **Storage**: Approximately 2 GB for code, data, and results
 
 ### Runtime
 
 Approximate execution times on **Intel i5-13600KF CPU** with **NVIDIA RTX 4070 Super GPU** and **32GB RAM**:
 
 #### Ablation Studies
-
 | Experiment | Runtime |
 |:-----------|:--------|
 | Single configuration (non-Complete) | ~5 minutes |
@@ -538,27 +655,29 @@ Approximate execution times on **Intel i5-13600KF CPU** with **NVIDIA RTX 4070 S
 | All 5 ablation configurations | ~1 hour |
 
 #### Robustness Tests
-
 | Test Type | Single Configuration | Complete Model (M4) |
 |:----------|:--------------------|:--------------------|
 | Small-sample robustness | ~30 minutes | ~8 hours |
 | Noise robustness | ~30 minutes | ~8 hours |
 
 #### Full Experimental Suite
-
 - **Ablation studies** (5 configurations): ~1 hour
 - **Small-sample tests** (5 configurations × 5 gradients): ~10 hours
 - **Noise tests** (5 configurations × 5 levels): ~10 hours
 - **Total**: ~21 hours
 
-> **Note**: Runtime varies based on number of K-fold iterations (default: 5), number of repeats for robustness tests (default: 10–20), IADAF Bayesian optimization iterations (default: 100), and early stopping in DNN training.
+> **Note**: Runtime varies based on:
+> - Number of K-fold iterations (default: 5)
+> - Number of repeats for robustness tests (default: 10-20)
+> - IADAF Bayesian optimization iterations (default: 100)
+> - Early stopping in DNN training
 
 ## Citation
 
 If you use this code in your research, please cite:
 ```bibtex
 @article{wang2024physics,
-  title={Physics-Constrained Multi-Module Machine Learning Framework for Solubility Prediction from Small-Sample Experimental Data},
+  title={Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data},
   author={Wang, Yuan and Wang, Tiancheng and Du, Jindi and Chen, Qian and Zhang, Weidong and Liu, Dahuan},
   journal={Nature Communications},
   year={2024},
@@ -570,7 +689,7 @@ If you use this code in your research, please cite:
 
 The source code is permanently archived on Zenodo: https://doi.org/10.5281/zenodo.15624558
 
-For the latest updates, visit: https://github.com/wang201111/physics-constrained-solubility-framework
+For the latest updates, visit: https://github.com/wang201111/hybrid-intelligence-framework
 
 ## License
 
