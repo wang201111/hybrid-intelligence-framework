@@ -352,47 +352,33 @@ physics-informed-ml-framework/
 ├── data/
 │   │
 │   ├── solubility/
-│   │   ├── raw/
-│   │   │   ├── ternary/
-│   │   │   │   ├── KCl_MgCl2_H2O.xlsx
-│   │   │   │   ├── NaCl_KCl_H2O.xlsx
-│   │   │   │   └── NaCl_MgCl2_H2O.xlsx
-│   │   │   └── binary/
-│   │   │       ├── KCl_H2O.xlsx
-│   │   │       ├── MgCl2_H2O.xlsx
-│   │   │       └── NaCl_H2O.xlsx
-│   │   │
-│   │   ├── cleaned/
-│   │   │   ├── KCl_MgCl2_H2O_cleaned.xlsx
-│   │   │   ├── NaCl_KCl_H2O_cleaned.xlsx
-│   │   │   └── NaCl_MgCl2_H2O_cleaned.xlsx
-│   │   │
-│   │   ├── split_by_temperature/
-│   │   │   ├── KCl_MgCl2_H2O_low_temp.xlsx
-│   │   │   ├── KCl_MgCl2_H2O_high_temp.xlsx
-│   │   │   ├── NaCl_KCl_H2O_low_temp.xlsx
-│   │   │   ├── NaCl_KCl_H2O_high_temp.xlsx
-│   │   │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
-│   │   │   └── NaCl_MgCl2_H2O_high_temp.xlsx
-│   │   │
-│   │   └── fixed_splits/
-│   │       ├── train.xlsx
-│   │       ├── val.xlsx
-│   │       └── test.xlsx
-│   │
-│   └── viscosity/
-│       ├── raw/
-│       │   ├── ternary/
-│       │   │   └── MCH_cis_Decalin_HMN.xlsx
-│       │   └── binary/
-│       │       ├── MCH_cis_Decalin.xlsx
-│       │       ├── MCH_HMN.xlsx
-│       │       └── cis_Decalin_HMN.xlsx
-│       ├── cleaned/
-│       │   └── MCH_cis_Decalin_HMN_cleaned.xlsx
-│       └── split_by_temperature/
-│           ├── low_temp.xlsx
-│           └── high_temp.xlsx
+│      ├── raw/
+│      │   ├── ternary/
+│      │   │   ├── KCl_MgCl2_H2O.xlsx
+│      │   │   ├── NaCl_KCl_H2O.xlsx
+│      │   │   └── NaCl_MgCl2_H2O.xlsx
+│      │   └── binary/
+│      │       ├── KCl_H2O.xlsx
+│      │       ├── MgCl2_H2O.xlsx
+│      │       └── NaCl_H2O.xlsx
+│      │
+│      ├── cleaned/
+│      │   ├── KCl_MgCl2_H2O_cleaned.xlsx
+│      │   ├── NaCl_KCl_H2O_cleaned.xlsx
+│      │   └── NaCl_MgCl2_H2O_cleaned.xlsx
+│      │
+│      ├── split_by_temperature/
+│      │   ├── KCl_MgCl2_H2O_low_temp.xlsx
+│      │   ├── KCl_MgCl2_H2O_high_temp.xlsx
+│      │   ├── NaCl_KCl_H2O_low_temp.xlsx
+│      │   ├── NaCl_KCl_H2O_high_temp.xlsx
+│      │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
+│      │   └── NaCl_MgCl2_H2O_high_temp.xlsx
+│      │
+│          
+│          
+│   
+│      
 │
 ├── src/
 │   ├── __init__.py
@@ -400,88 +386,82 @@ physics-informed-ml-framework/
 │   ├── t_kmeans_lof.py
 │   ├── iadaf.py
 │   ├── ldpc_solubility.py
-│   ├── ldpc_viscosity.py
 │   ├── solubility_pipeline.py
-│   ├── viscosity_pipeline.py
 │   ├── utils_solubility.py
-│   └── utils_viscosity.py
+│   
 │
 ├── models/
 │   ├── solubility/
-│   │   └── binary/
-│   │       ├── KCl_H2O.pth
-│   │       ├── MgCl2_H2O.pth
-│   │       └── NaCl_H2O.pth
-│   │
-│   └── viscosity/
-│       └── binary/
-│           ├── cis_Decalin_HMN.pth
-│           ├── MCH_cis_Decalin.pth
-│           └── MCH_HMN.pth
+│      └── binary/
+│          ├── KCl_H2O.pth
+│          ├── MgCl2_H2O.pth
+│          └── NaCl_H2O.pth
+│   
+│  
+│       
+│     
+│      
+│     
 │
 ├── experiments/
 │   │
-│   ├── solubility/
-│   │   ├── __init__.py
-│   │   │
-│   │   ├── ablation/
-│   │   │   ├── __init__.py
-│   │   │   ├── baseline_experiment.py
-│   │   │   ├── T_KMeans_LOF_experiment.py
-│   │   │   ├── IADAF_experiment.py
-│   │   │   ├── LDPC_experiment.py
-│   │   │   └── Complete_Model_experiment.py
-│   │   │
-│   │   ├── small_sample/
-│   │   │   ├── __init__.py
-│   │   │   ├── small_sample_baseline_experiment.py
-│   │   │   ├── small_sample_T_KMeans_LOF_experiment.py
-│   │   │   ├── small_sample_IADAF_experiment.py
-│   │   │   ├── small_sample_LDPC_experiment.py
-│   │   │   └── small_sample_Complete_Model_experiment.py
-│   │   │
-│   │   └── noise/
-│   │       ├── __init__.py
-│   │       ├── noise_robustness_baseline_experiment.py
-│   │       ├── noise_robustness_T_KMeans_LOF_experiment.py
-│   │       ├── noise_robustness_IADAF_experiment.py
-│   │       ├── noise_robustness_LDPC_experiment.py
-│   │       └── noise_robustness_Complete_Model_experiment.py
-│   │
-│   └── viscosity/
-│       ├── __init__.py
-│       └── ablation/
-│           ├── __init__.py
-│           ├── baseline_experiment.py
-│           └── Complete_Model_experiment.py
+│   ── solubility/
+│      ├── __init__.py
+│      │
+│      ├── ablation/
+│      │   ├── __init__.py
+│      │   ├── baseline_experiment.py
+│      │   ├── T_KMeans_LOF_experiment.py
+│      │   ├── IADAF_experiment.py
+│      │   ├── LDPC_experiment.py
+│      │   └── Complete_Model_experiment.py
+│      │
+│      ├── small_sample/
+│      │   ├── __init__.py
+│      │   ├── small_sample_baseline_experiment.py
+│      │   ├── small_sample_T_KMeans_LOF_experiment.py
+│      │   ├── small_sample_IADAF_experiment.py
+│      │   ├── small_sample_LDPC_experiment.py
+│      │   └── small_sample_Complete_Model_experiment.py
+│      │
+│      └── noise/
+│          ├── __init__.py
+│          ├── noise_robustness_baseline_experiment.py
+│          ├── noise_robustness_T_KMeans_LOF_experiment.py
+│          ├── noise_robustness_IADAF_experiment.py
+│          ├── noise_robustness_LDPC_experiment.py
+│          └── noise_robustness_Complete_Model_experiment.py
+│   
+│ 
+│      
+│     
+│      
+│        
+│       
 │
 └── results/
     ├── solubility/
-    │   ├── ablation/
-    │   │   ├── baseline_results/
-    │   │   ├── T_KMeans_LOF_results/
-    │   │   ├── IADAF_results/
-    │   │   ├── LDPC_results/
-    │   │   └── Complete_Model_results/
-    │   │
-    │   ├── small_sample/
-    │   │   ├── small_sample_baseline_results/
-    │   │   ├── small_sample_T_KMeans_LOF_results/
-    │   │   ├── small_sample_IADAF_results/
-    │   │   ├── small_sample_LDPC_results/
-    │   │   └── small_sample_Complete_Model_results/
-    │   │
-    │   └── noise/
-    │       ├── noise_robustness_baseline_results/
-    │       ├── noise_robustness_T_KMeans_LOF_results/
-    │       ├── noise_robustness_IADAF_results/
-    │       ├── noise_robustness_LDPC_results/
-    │       └── noise_robustness_Complete_Model_results/
-    │
-    └── viscosity/
-        └── ablation/
-            ├── baseline_results/
-            └── Complete_Model_results/
+       ├── ablation/
+       │   ├── baseline_results/
+       │   ├── T_KMeans_LOF_results/
+       │   ├── IADAF_results/
+       │   ├── LDPC_results/
+       │   └── Complete_Model_results/
+       │
+       ├── small_sample/
+       │   ├── small_sample_baseline_results/
+       │   ├── small_sample_T_KMeans_LOF_results/
+       │   ├── small_sample_IADAF_results/
+       │   ├── small_sample_LDPC_results/
+       │   └── small_sample_Complete_Model_results/
+       │
+       └── noise/
+           ├── noise_robustness_baseline_results/
+           ├── noise_robustness_T_KMeans_LOF_results/
+           ├── noise_robustness_IADAF_results/
+           ├── noise_robustness_LDPC_results/
+           └── noise_robustness_Complete_Model_results/
+
 ```
 
 ## Data Description
@@ -507,15 +487,6 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 - Total datapoints: 313
 - Training: -35°C to 100°C (244 points)
 - Testing: 100°C to 200°C (69 points, high-temperature extrapolation)
-
-### Viscosity System
-
-**MCH-cis-Decalin-HMN** (Methylcyclohexane-cis-Decalin-Heptamethylnonane)
-- Temperature range: 20-80°C
-- Pressure range: 0.1-100 MPa
-- Total datapoints: 546
-- Training: 20-40°C (136 points)
-- Testing: 40-80°C (387 points, high-temperature extrapolation)
 
 ### Data Organization
 
