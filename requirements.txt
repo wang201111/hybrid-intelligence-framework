@@ -1,0 +1,11 @@
+# Python 3.9 (per manuscript Methods)
+# Versions pinned to the manuscript's reported environment where specified.
+torch==1.9.0
+scikit-learn==1.0.1
+bayesian-optimization==1.4.2
+numpy==1.21.0
+pandas==1.3.0
+openpyxl==3.0.0
+xgboost
+scipy
+tqdm

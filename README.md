@@ -1,4 +1,4 @@
-# Hybrid Intelligence Framework for High-Temperature Solubility Extrapolation in Multicomponent Chloride Saltwater Systems
+# Hybrid Intelligence Framework for High-Temperature Solubility Extrapolation in Multicomponent Chloride Salt-Water Systems
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15624558.svg)](https://doi.org/10.5281/zenodo.15624558)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -7,14 +7,14 @@
 
 This repository contains the complete implementation of the framework described in the paper:
 
-**"Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data"**
+**"A Hybrid Intelligence Framework for High-Temperature Solubility Extrapolation in Multicomponent Chloride Salt-Water Systems"**
 
-*Submitted to Nature Communications*
+*Manuscript under review*
 
 The framework addresses three critical challenges in small-sample scientific prediction: data noise, data scarcity, and physical inconsistency. It integrates three complementary modules:
 
 - **T-KMeans-LOF**: Temperature-guided outlier detection based on thermodynamic stability principle
-- **IADAF**: Iterative adaptive data augmentation using WGAN-GP with Bayesian optimization
+- **IADAF**: Integrated adaptive data augmentation using WGAN-GP with Bayesian optimization
 - **LDPC**: Low-dimensional physical constraints for boundary consistency
 
 Unlike traditional PINNs that require explicit governing equations, this framework embeds macroscopic physical principles as soft constraints, enabling broad applicability across diverse chemical systems.
@@ -23,7 +23,6 @@ Unlike traditional PINNs that require explicit governing equations, this framewo
 
 - High-temperature extrapolation from limited training data
 - Physics-informed constraints without explicit differential equations
-- Transferable across different property types (equilibrium and transport properties)
 - Robust performance under data scarcity and noise contamination
 - Modular design allowing independent evaluation of each component
 
@@ -104,28 +103,6 @@ print(f"Test R2: {results['test_r2']:.3f}")
 print(f"Boundary Consistency: {results['boundary_consistency']:.3f}")
 ```
 
-### Viscosity Prediction Example
-```python
-from src.viscosity_pipeline import ViscosityPipeline
-
-# Initialize complete framework
-pipeline = ViscosityPipeline(
-    system_name='MCH-cis-Decalin-HMN',
-    use_outlier_detection=True,
-    use_augmentation=True,
-    use_physical_constraints=True
-)
-
-# Load data
-pipeline.load_data('data/viscosity/raw/ternary/MCH_cis_Decalin_HMN.xlsx')
-
-# Run workflow
-results = pipeline.run()
-
-print(f"Test R2: {results['test_r2']:.3f}")
-print(f"Physical Rationality: {results['physics_score']:.3f}")
-```
-
 ## How to Run
 
 All experiments are standalone Python scripts that can be executed directly from the project root.
@@ -186,16 +163,6 @@ python noise_robustness_Complete_Model_experiment.py
 
 **Runtime**: ~30 minutes each (Complete Model: ~8 hours)
 
-### Viscosity System
-
-Cross-validation experiments on transport properties:
-```bash
-cd experiments/viscosity/ablation
-
-python baseline_experiment.py              # Baseline
-python Complete_Model_experiment.py        # Complete M4 pipeline
-```
-
 ### Run All Experiments
 ```bash
 # Run complete experimental suite (solubility only)
@@ -222,7 +189,7 @@ Expected results for **KCl-MgCl2-H2O** system:
 | Baseline | 0.572 ± 0.313 | 8.833 ± 3.460 | 0.612 ± 0.123 |
 | Complete Model | 0.873 ± 0.015 | 5.090 ± 0.304 | 0.978 ± 0.002 |
 
-**Training Range**: -34°C to 100°C (484 points)  
+**Training Range**: -34°C to 100°C (484 points)
 **Testing Range**: 100°C to 227°C (135 points, high-temperature extrapolation)
 
 **Run commands:**
@@ -345,123 +312,80 @@ results/solubility/ablation/Complete_Model_results/
 ## Repository Structure
 ```
 physics-informed-ml-framework/
-│
 ├── README.md
 ├── requirements.txt
+├── environment.yml
+├── LICENSE.txt
 │
 ├── data/
-│   │
-│   ├── solubility/
-│      ├── raw/
-│      │   ├── ternary/
-│      │   │   ├── KCl_MgCl2_H2O.xlsx
-│      │   │   ├── NaCl_KCl_H2O.xlsx
-│      │   │   └── NaCl_MgCl2_H2O.xlsx
-│      │   └── binary/
-│      │       ├── KCl_H2O.xlsx
-│      │       ├── MgCl2_H2O.xlsx
-│      │       └── NaCl_H2O.xlsx
-│      │
-│      ├── cleaned/
-│      │   ├── KCl_MgCl2_H2O_cleaned.xlsx
-│      │   ├── NaCl_KCl_H2O_cleaned.xlsx
-│      │   └── NaCl_MgCl2_H2O_cleaned.xlsx
-│      │
-│      ├── split_by_temperature/
-│      │   ├── KCl_MgCl2_H2O_low_temp.xlsx
-│      │   ├── KCl_MgCl2_H2O_high_temp.xlsx
-│      │   ├── NaCl_KCl_H2O_low_temp.xlsx
-│      │   ├── NaCl_KCl_H2O_high_temp.xlsx
-│      │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
-│      │   └── NaCl_MgCl2_H2O_high_temp.xlsx
-│      │
-│          
-│          
-│   
-│      
+│   ├── data_README.md
+│   └── solubility/
+│       ├── raw/
+│       │   ├── ternary/
+│       │   │   ├── KCl_MgCl2_H2O.xlsx
+│       │   │   ├── NaCl_KCl_H2O.xlsx
+│       │   │   └── NaCl_MgCl2_H2O.xlsx
+│       │   └── binary/
+│       │       ├── KCl_H2O.xlsx
+│       │       ├── MgCl2_H2O.xlsx
+│       │       └── NaCl_H2O.xlsx
+│       ├── cleaned/
+│       │   ├── KCl_MgCl2_H2O_cleaned.xlsx
+│       │   ├── NaCl_KCl_H2O_cleaned.xlsx
+│       │   └── NaCl_MgCl2_H2O_cleaned.xlsx
+│       ├── split_by_temperature/
+│       │   ├── KCl_MgCl2_H2O_low_temp.xlsx
+│       │   ├── KCl_MgCl2_H2O_high_temp.xlsx
+│       │   ├── NaCl_KCl_H2O_low_temp.xlsx
+│       │   ├── NaCl_KCl_H2O_high_temp.xlsx
+│       │   ├── NaCl_MgCl2_H2O_low_temp.xlsx
+│       │   └── NaCl_MgCl2_H2O_high_temp.xlsx
+│       └── fixed_splits/
+│           ├── train.xlsx
+│           ├── val.xlsx
+│           └── test.xlsx
 │
 ├── src/
-│   ├── __init__.py
 │   ├── binary_predictor.py
 │   ├── t_kmeans_lof.py
 │   ├── iadaf.py
 │   ├── ldpc_solubility.py
 │   ├── solubility_pipeline.py
-│   ├── utils_solubility.py
-│   
+│   └── utils_solubility.py
 │
 ├── models/
-│   ├── solubility/
-│      └── binary/
-│          ├── KCl_H2O.pth
-│          ├── MgCl2_H2O.pth
-│          └── NaCl_H2O.pth
-│   
-│  
-│       
-│     
-│      
-│     
+│   └── solubility/
+│       └── binary/
+│           ├── KCl_H2O.pth
+│           ├── MgCl2_H2O.pth
+│           └── NaCl_H2O.pth
 │
 ├── experiments/
-│   │
-│   ── solubility/
-│      ├── __init__.py
-│      │
-│      ├── ablation/
-│      │   ├── __init__.py
-│      │   ├── baseline_experiment.py
-│      │   ├── T_KMeans_LOF_experiment.py
-│      │   ├── IADAF_experiment.py
-│      │   ├── LDPC_experiment.py
-│      │   └── Complete_Model_experiment.py
-│      │
-│      ├── small_sample/
-│      │   ├── __init__.py
-│      │   ├── small_sample_baseline_experiment.py
-│      │   ├── small_sample_T_KMeans_LOF_experiment.py
-│      │   ├── small_sample_IADAF_experiment.py
-│      │   ├── small_sample_LDPC_experiment.py
-│      │   └── small_sample_Complete_Model_experiment.py
-│      │
-│      └── noise/
-│          ├── __init__.py
-│          ├── noise_robustness_baseline_experiment.py
-│          ├── noise_robustness_T_KMeans_LOF_experiment.py
-│          ├── noise_robustness_IADAF_experiment.py
-│          ├── noise_robustness_LDPC_experiment.py
-│          └── noise_robustness_Complete_Model_experiment.py
-│   
-│ 
-│      
-│     
-│      
-│        
-│       
+│   └── solubility/
+│       ├── ablation/
+│       │   ├── baseline_experiment.py
+│       │   ├── T_KMeans_LOF_experiment.py
+│       │   ├── IADAF_experiment.py
+│       │   ├── LDPC_experiment.py
+│       │   └── Complete_Model_experiment.py
+│       ├── small_sample/
+│       │   ├── small_sample_baseline_experiment.py
+│       │   ├── small_sample_T_KMeans_LOF_experiment.py
+│       │   ├── small_sample_IADAF_experiment.py
+│       │   ├── small_sample_LDPC_experiment.py
+│       │   └── small_sample_Complete_Model_experiment.py
+│       └── noise/
+│           ├── noise_robustness_baseline_experiment.py
+│           ├── noise_robustness_T_KMeans_LOF_experiment.py
+│           ├── noise_robustness_IADAF_experiment.py
+│           ├── noise_robustness_LDPC_experiment.py
+│           └── noise_robustness_Complete_Model_experiment.py
 │
 └── results/
-    ├── solubility/
-       ├── ablation/
-       │   ├── baseline_results/
-       │   ├── T_KMeans_LOF_results/
-       │   ├── IADAF_results/
-       │   ├── LDPC_results/
-       │   └── Complete_Model_results/
-       │
-       ├── small_sample/
-       │   ├── small_sample_baseline_results/
-       │   ├── small_sample_T_KMeans_LOF_results/
-       │   ├── small_sample_IADAF_results/
-       │   ├── small_sample_LDPC_results/
-       │   └── small_sample_Complete_Model_results/
-       │
-       └── noise/
-           ├── noise_robustness_baseline_results/
-           ├── noise_robustness_T_KMeans_LOF_results/
-           ├── noise_robustness_IADAF_results/
-           ├── noise_robustness_LDPC_results/
-           └── noise_robustness_Complete_Model_results/
-
+    └── solubility/
+        ├── ablation/
+        ├── small_sample/
+        └── noise/
 ```
 
 ## Data Description
@@ -508,13 +432,6 @@ Three ternary salt-water subsystems of the NaCl-KCl-MgCl2-H2O quaternary system:
 - Component 2 mass fraction (%)
 - Solubility (target variable)
 
-**Viscosity data** (Excel format):
-- Temperature (°C)
-- Pressure (MPa)
-- x1 (mole fraction of component 1)
-- x2 (mole fraction of component 2)
-- Viscosity (mPa·s, target variable)
-
 ## Framework Components
 
 ### Module 1: T-KMeans-LOF
@@ -536,7 +453,7 @@ Temperature-guided outlier detection based on the thermodynamic stability princi
 
 ### Module 2: IADAF
 
-Iterative adaptive data augmentation using WGAN-GP with Bayesian optimization.
+Integrated adaptive data augmentation using WGAN-GP with Bayesian optimization.
 
 **Key principle**: Learn intrinsic distribution of cleaned data to generate synthetic samples, transforming discrete experimental points into a continuous data manifold.
 
@@ -549,7 +466,7 @@ Iterative adaptive data augmentation using WGAN-GP with Bayesian optimization.
 **Optimized hyperparameters**:
 - latent_dim: Latent space dimensionality (range: 1-100)
 - hidden_dim: Hidden layer dimensionality (range: 150-350)
-- lambda_gp: Gradient penalty coefficient (range: 0.05-5.0)
+- lambda_gp: Gradient penalty coefficient (range: 0.05-0.5)
 
 ### Module 3: LDPC
 
@@ -564,8 +481,6 @@ Low-dimensional physical constraints based on topological continuity of macrosco
 - Boundary constraints propagate to interior points through interpolation
 
 **Solubility systems**: Two binary boundaries (Component 1-Water, Component 2-Water)
-
-**Viscosity systems**: Three binary boundaries (MCH=0, Decalin=0, HMN=0)
 
 **Key parameters**:
 - decay_rate: Controls extent of boundary correction (default: k=2)
@@ -596,12 +511,12 @@ Low-dimensional physical constraints based on topological continuity of macrosco
 
 Core packages with exact versions specified in requirements.txt:
 
-- PyTorch 1.12.0 (deep learning framework)
+- PyTorch 1.9.0 (deep learning framework)
 - NumPy 1.21.0 (numerical computing)
 - pandas 1.3.0 (data manipulation)
-- scikit-learn 1.0.0 (machine learning utilities)
+- scikit-learn 1.0.1 (machine learning utilities)
 - openpyxl 3.0.0 (Excel file handling)
-- bayesian-optimization 1.2.0 (hyperparameter tuning)
+- bayesian-optimization 1.4.2 (hyperparameter tuning)
 - XGBoost (quality screening in IADAF)
 
 All dependencies are pinned to exact versions to ensure reproducibility.
@@ -647,12 +562,11 @@ Approximate execution times on **Intel i5-13600KF CPU** with **NVIDIA RTX 4070 S
 
 If you use this code in your research, please cite:
 ```bibtex
-@article{wang2024physics,
-  title={Physics-Constrained Multi-Module Machine Learning Framework for Scientific Prediction from Small-Sample Experimental Data},
-  author={Wang, Yuan and Wang, Tiancheng and Du, Jindi and Chen, Qian and Zhang, Weidong and Liu, Dahuan},
-  journal={Nature Communications},
-  year={2024},
-  note={Under review}
+@article{wang2026hybrid,
+  title={A Hybrid Intelligence Framework for High-Temperature Solubility Extrapolation in Multicomponent Chloride Salt-Water Systems},
+  author={Wang, Yuan and Yuan, Shuaiying and Wang, Tiancheng and Du, Jindi and Chen, Qian and Li, Song and Zhang, Weidong and Liu, Dahuan},
+  year={2026},
+  note={Manuscript under review}
 }
 ```
 
@@ -672,7 +586,7 @@ For questions or issues:
 - Open an issue on GitHub
 - Contact corresponding authors:
   - Prof. Dahuan Liu: liudh@mail.buct.edu.cn
-  - Prof. Weidong Zhang: weidzhang1208@126.com
+  - Prof. Weidong Zhang: weidzhang1208@163.com
 
 ## Acknowledgments
 
@@ -680,4 +594,4 @@ This work was supported by the National Natural Science Foundation of China (224
 
 ## Version History
 
-- v1.0.0 (January 2025): Initial release accompanying Nature Communications submission
+- v1.0.0 (2026): Initial release accompanying the manuscript submission
