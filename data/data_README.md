@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains experimental data for validating the physics-constrained machine learning framework across four chemical systems. The data organization is carefully designed to support rigorous evaluation of model generalization and high-temperature extrapolation capabilities.
+This directory contains experimental data for validating the physics-constrained machine learning framework across three chloride salt-water systems. The data organization is carefully designed to support rigorous evaluation of model generalization and high-temperature extrapolation capabilities.
 
 ## Critical Design Principle: Temperature-Based Data Management
 
@@ -23,15 +23,11 @@ The framework's key innovation is predicting high-temperature properties by trai
 All data are compiled from publicly available literature:
 
 **Solubility Systems:**
-- KCl-MgCl2-H2O: References 57-63 from manuscript
+- KCl-MgCl2-H2O: compiled from the literature cited in the manuscript
   - Mallet (1902), Saunders (1899), Schrelnemakers (1909), etc.
-- NaCl-KCl-H2O: References 57-60, 62
-- NaCl-MgCl2-H2O: References 60-61, 64-65
+- NaCl-KCl-H2O: compiled from the literature cited in the manuscript
+- NaCl-MgCl2-H2O: compiled from the literature cited in the manuscript
   - Yang et al. (2013), Charykova & Charykov (2007), etc.
-
-**Viscosity System:**
-- MCH-cis-Decalin-HMN: Reference 69
-  - Zéberg-Mikkelsen et al. (2003). J. Chem. Eng. Data, 48, 1387-1392
 
 ## Data Format Specifications
 
@@ -50,52 +46,33 @@ Temperature | w(KCl)/% | w(MgCl2)/%
 25.0        | 15.8     | 35.6
 ```
 
-### Viscosity Data Format
-```
-Column 1: Temperature (°C)
-Column 2: Pressure (MPa)
-Column 3: Mole fraction of MCH (x1)
-Column 4: Mole fraction of cis-Decalin (x2)
-Column 5: Viscosity (mPa·s)
-```
-
-Example:
-```
-Temperature | Pressure | x(MCH) | x(cis-Dec) | Viscosity
-20.0        | 0.1      | 0.333  | 0.333      | 1.234
-40.0        | 10.0     | 0.500  | 0.250      | 1.456
-```
-
 ## Directory Structure
 
 ```
 data/
-├── solubility/
-│   ├── raw/
-│   │   ├── ternary/              # Original three-component data
-│   │   │   ├── KCl_MgCl2_H2O.xlsx       (619 points, -34°C to 227°C)
-│   │   │   ├── NaCl_KCl_H2O.xlsx        (463 points, -23°C to 180°C)
-│   │   │   └── NaCl_MgCl2_H2O.xlsx      (313 points, -35°C to 200°C)
-│   │   └── binary/               # Two-component boundary data (for LDPC)
-│   │       ├── KCl_H2O.xlsx
-│   │       ├── MgCl2_H2O.xlsx
-│   │       └── NaCl_H2O.xlsx
-│   │
-│   ├── cleaned/                  # After T-KMeans-LOF processing
-│   │   └── [System]_cleaned.xlsx
-│   │
-│   ├── split_by_temperature/     # Temperature-based train/test splits
-│   │   ├── KCl_MgCl2_H2O_low_temp.xlsx   # For 5-fold CV (484 points, -34~100°C)
-│   │   ├── KCl_MgCl2_H2O_high_temp.xlsx  # For testing (135 points, 100~227°C)
-│   │   └── ... (similarly for other systems)
-│   │
-│   └── fixed_splits/             # Fixed splits for specific experiments
-│       ├── train.xlsx            # Low-temp training set (raw, with noise)
-│       ├── val.xlsx              # Low-temp validation set (cleaned)
-│       └── test.xlsx             # High-temp test set (cleaned)
-│
-└── viscosity/
-    └── [Similar structure as solubility]
+└── solubility/
+    ├── raw/
+    │   ├── ternary/              # Original three-component data
+    │   │   ├── KCl_MgCl2_H2O.xlsx       (619 points, -34°C to 227°C)
+    │   │   ├── NaCl_KCl_H2O.xlsx        (463 points, -23°C to 180°C)
+    │   │   └── NaCl_MgCl2_H2O.xlsx      (313 points, -35°C to 200°C)
+    │   └── binary/               # Two-component boundary data (for LDPC)
+    │       ├── KCl_H2O.xlsx
+    │       ├── MgCl2_H2O.xlsx
+    │       └── NaCl_H2O.xlsx
+    │
+    ├── cleaned/                  # After T-KMeans-LOF processing
+    │   └── [System]_cleaned.xlsx
+    │
+    ├── split_by_temperature/     # Temperature-based train/test splits
+    │   ├── KCl_MgCl2_H2O_low_temp.xlsx   # For 5-fold CV (484 points, -34~100°C)
+    │   ├── KCl_MgCl2_H2O_high_temp.xlsx  # For testing (135 points, 100~227°C)
+    │   └── ... (similarly for other systems)
+    │
+    └── fixed_splits/             # Fixed splits for specific experiments
+        ├── train.xlsx            # Low-temp training set (raw, with noise)
+        ├── val.xlsx              # Low-temp validation set (cleaned)
+        └── test.xlsx             # High-temp test set (cleaned)
 ```
 
 ## Temperature-Based Splitting Strategy
@@ -122,11 +99,6 @@ All systems use temperature-based splitting to evaluate high-temperature extrapo
 - **Low-temperature**: 244 points from -35°C to 100°C
 - **High-temperature**: 69 points from 100°C to 200°C
 
-### MCH-cis-Decalin-HMN System
-- **Total datapoints**: 546 (20°C to 80°C, 0.1 to 100 MPa)
-- **Low-temperature**: 136 points from 20°C to 40°C
-- **High-temperature**: 387 points from 40°C to 80°C
-
 ## Experimental Design and Data Processing Protocols
 
 ### Design Philosophy
@@ -152,7 +124,7 @@ The framework's effectiveness depends on how different modules handle noisy, sma
 
 #### IADAF Model
 - **Training data**: Uses raw low-temperature data
-- **Processing**: Generates 1500 synthetic samples via WGAN-GP
+- **Processing**: Generates 2000 synthetic samples via WGAN-GP
 - **Rationale**: Tests if data augmentation alone helps with extrapolation
 - **Challenge**: Synthetic data quality depends on learning from noisy originals
 
@@ -231,7 +203,7 @@ test_clean = load('fixed_splits/test.xlsx')  # 135 points (high-temp, cleaned)
 # Subsample training set at different ratios
 for ratio in [0.10, 0.25, 0.50, 0.75, 1.00]:
     train_subset = sample(train_raw, ratio)  # e.g., 32, 80, 160, 240, 320 points
-    
+
     # Model-specific processing
     if model == 'T-KMeans-LOF':
         train_processed = clean_outliers(train_subset)
@@ -242,7 +214,7 @@ for ratio in [0.10, 0.25, 0.50, 0.75, 1.00]:
         train_processed = augment_data(train_processed)
     else:  # Baseline or LDPC
         train_processed = train_subset  # No preprocessing
-    
+
     # Train and evaluate
     model.fit(train_processed)
     val_score = model.evaluate(val_clean)
@@ -259,12 +231,12 @@ test_clean = load('fixed_splits/test.xlsx')
 # Inject Gaussian noise into training target variable
 for noise_level in [0.05, 0.10, 0.15, 0.20]:
     train_noisy = add_gaussian_noise(train_raw, noise_level)
-    
+
     # Model-specific processing
     if model == 'T-KMeans-LOF':
         train_processed = clean_outliers(train_noisy)  # Should remove added noise
     # ... (similar to above)
-    
+
     # Evaluate noise tolerance
     model.fit(train_processed)
     test_score = model.evaluate(test_clean)
@@ -314,7 +286,7 @@ After outlier removal, cleaned datasets are augmented with synthetic samples:
 
 **Augmentation Configuration:**
 ```python
-n_synthetic = 1500                # Samples to generate per system
+n_synthetic = 2000                # Samples to generate per system
 latent_dim_range = (1, 100)       # Bayesian optimization search space
 hidden_dim_range = (150, 350)     # Bayesian optimization search space
 n_iterations = 100                # Bayesian optimization budget
@@ -323,13 +295,13 @@ n_iterations = 100                # Bayesian optimization budget
 **Quality Control:**
 - XGBoost discriminator filters low-quality samples (threshold: 15 wt%)
 - Validation R² on real data used as optimization objective
-- Final synthetic dataset: 1500 high-quality samples per system
+- Final synthetic dataset: 2000 high-quality samples per system
 
 **Augmented Dataset Composition:**
 ```
-KCl-MgCl2-H2O:  387 (real) + 1500 (synthetic) = 1887 total
-NaCl-KCl-H2O:   253 (real) + 1500 (synthetic) = 1753 total
-NaCl-MgCl2-H2O: 195 (real) + 1500 (synthetic) = 1695 total
+KCl-MgCl2-H2O:  387 (real) + 2000 (synthetic) = 2387 total
+NaCl-KCl-H2O:   253 (real) + 2000 (synthetic) = 2253 total
+NaCl-MgCl2-H2O: 195 (real) + 2000 (synthetic) = 2195 total
 ```
 
 ## Critical Note: Real vs. Synthetic Data in Evaluation
@@ -363,25 +335,13 @@ NaCl-H2O:   Saturation curve from -23°C to 200°C
 - Predict boundary values at any temperature
 - Apply exponential decay-weighted corrections to ternary predictions
 
-### Viscosity Binary Systems
-```
-MCH-cis-Decalin:      Viscosity surface (T, P, x1)
-MCH-HMN:              Viscosity surface (T, P, x2)
-cis-Decalin-HMN:      Viscosity surface (T, P, x3)
-```
-
-**Three-Boundary Constraint:**
-- When x(MCH) → 0: Predict using cis-Decalin-HMN boundary
-- When x(cis-Dec) → 0: Predict using MCH-HMN boundary  
-- When x(HMN) → 0: Predict using MCH-cis-Decalin boundary
-
 ## Data Archiving and Reproducibility
 
 **Primary Repository:**
 - GitHub: https://github.com/wang201111/hybrid-intelligence-framework/tree/main/data
 
 **Permanent Archive:**
-- Zenodo: https://doi.org/10.5281/zenodo.15624559
+- Zenodo: https://doi.org/10.5281/zenodo.15624558
 - Includes all raw data, processed data, and binary system data
 - Ensures long-term reproducibility independent of GitHub
 
@@ -403,8 +363,8 @@ md5sum -c checksums.txt
 
 **Citation:**
 If you use this data, please cite both:
-1. The original literature sources (References 57-69 in manuscript)
-2. This framework paper: Wang et al. (2025), Nature Communications
+1. The original literature sources cited in the manuscript
+2. This framework paper (Wang et al., manuscript under review)
 
 ## Frequently Asked Questions
 
@@ -447,20 +407,19 @@ A: Pre-cleaning the test set ensures:
 
 For data-related questions:
 - Dahuan Liu: liudh@mail.buct.edu.cn
-- Weidong Zhang: weidzhang1208@126.com
+- Weidong Zhang: weidzhang1208@163.com
 - GitHub Issues: https://github.com/wang201111/hybrid-intelligence-framework/issues
 
 ## References
 
-Complete data source references available in manuscript References 57-69.
+Complete data source references are available in the manuscript.
 
 Key references:
 - Mallet, J.W. (1902). On the Relation of Conductivity. American Chemical Journal, 27, 55-58.
-- Zéberg-Mikkelsen et al. (2003). High-pressure viscosity measurements. J. Chem. Eng. Data, 48, 1387-1392.
 - See manuscript for complete bibliography.
 
 ---
 
-**Last Updated:** January 2025  
-**Version:** 1.0  
-**Status:** Peer review at Nature Communications
+**Last Updated:** January 2025
+**Version:** 1.0
+**Status:** Manuscript under review
