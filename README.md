@@ -130,38 +130,8 @@ python IADAF_experiment.py                 # + Data augmentation
 python LDPC_experiment.py                  # + Physical constraints
 python Complete_Model_experiment.py        # All modules combined
 ```
-
 **Runtime**: ~5 minutes each (Complete Model: ~40 minutes)
 
-### Small-Sample Robustness Tests
-
-Evaluate performance with reduced training data (10%, 25%, 50%, 75%, 100%):
-```bash
-cd experiments/solubility/small_sample
-
-python small_sample_baseline_experiment.py
-python small_sample_T_KMeans_LOF_experiment.py
-python small_sample_IADAF_experiment.py
-python small_sample_LDPC_experiment.py
-python small_sample_Complete_Model_experiment.py
-```
-
-**Runtime**: ~30 minutes each (Complete Model: ~8 hours)
-
-### Noise Robustness Tests
-
-Test tolerance to measurement errors (0%, 5%, 10%, 15%, 20% noise):
-```bash
-cd experiments/solubility/noise
-
-python noise_robustness_baseline_experiment.py
-python noise_robustness_T_KMeans_LOF_experiment.py
-python noise_robustness_IADAF_experiment.py
-python noise_robustness_LDPC_experiment.py
-python noise_robustness_Complete_Model_experiment.py
-```
-
-**Runtime**: ~30 minutes each (Complete Model: ~8 hours)
 
 ### Run All Experiments
 ```bash
@@ -171,11 +141,6 @@ cd experiments/solubility
 # Ablation studies (~1 hour)
 for script in ablation/*.py; do python "$script"; done
 
-# Small-sample tests (~10 hours)
-for script in small_sample/*.py; do python "$script"; done
-
-# Noise robustness tests (~10 hours)
-for script in noise/*.py; do python "$script"; done
 ```
 
 ## Reproducing Paper Results
@@ -239,43 +204,7 @@ python Complete_Model_experiment.py
 
 **Compare results:** Check `results/solubility/ablation/*/summary/summary_metrics.xlsx`
 
-### Small-Sample Robustness Tests
 
-Test framework performance with reduced training data:
-```bash
-cd experiments/solubility/small_sample
-
-python small_sample_baseline_experiment.py
-python small_sample_T_KMeans_LOF_experiment.py
-python small_sample_IADAF_experiment.py
-python small_sample_LDPC_experiment.py
-python small_sample_Complete_Model_experiment.py
-```
-
-**Expected behavior:**
-- Complete Model maintains Test R² > 0.4 even at 10% data (32 samples)
-- Baseline Model drops to Test R² < -1.0 at 10% data
-
-These experiments evaluate performance at 10%, 25%, 50%, 75%, and 100% of training data.
-
-### Noise Robustness Tests
-
-Test framework tolerance to measurement errors:
-```bash
-cd experiments/solubility/noise
-
-python noise_robustness_baseline_experiment.py
-python noise_robustness_T_KMeans_LOF_experiment.py
-python noise_robustness_IADAF_experiment.py
-python noise_robustness_LDPC_experiment.py
-python noise_robustness_Complete_Model_experiment.py
-```
-
-**Expected behavior:**
-- Complete Model maintains Test R² > 0.7 even at 20% noise
-- Baseline Model drops to Test R² < -10.0 at 20% noise
-
-These experiments inject Gaussian noise at 5%, 10%, 15%, and 20% levels.
 
 ## Results Organization
 
@@ -368,18 +297,6 @@ physics-informed-ml-framework/
 │       │   ├── IADAF_experiment.py
 │       │   ├── LDPC_experiment.py
 │       │   └── Complete_Model_experiment.py
-│       ├── small_sample/
-│       │   ├── small_sample_baseline_experiment.py
-│       │   ├── small_sample_T_KMeans_LOF_experiment.py
-│       │   ├── small_sample_IADAF_experiment.py
-│       │   ├── small_sample_LDPC_experiment.py
-│       │   └── small_sample_Complete_Model_experiment.py
-│       └── noise/
-│           ├── noise_robustness_baseline_experiment.py
-│           ├── noise_robustness_T_KMeans_LOF_experiment.py
-│           ├── noise_robustness_IADAF_experiment.py
-│           ├── noise_robustness_LDPC_experiment.py
-│           └── noise_robustness_Complete_Model_experiment.py
 │
 └── results/
     └── solubility/
@@ -540,17 +457,10 @@ Approximate execution times on **Intel i5-13600KF CPU** with **NVIDIA RTX 4070 S
 | Complete Model (M4 pipeline) | ~40 minutes |
 | All 5 ablation configurations | ~1 hour |
 
-#### Robustness Tests
-| Test Type | Single Configuration | Complete Model (M4) |
-|:----------|:--------------------|:--------------------|
-| Small-sample robustness | ~30 minutes | ~8 hours |
-| Noise robustness | ~30 minutes | ~8 hours |
 
 #### Full Experimental Suite
 - **Ablation studies** (5 configurations): ~1 hour
-- **Small-sample tests** (5 configurations × 5 gradients): ~10 hours
-- **Noise tests** (5 configurations × 5 levels): ~10 hours
-- **Total**: ~21 hours
+
 
 > **Note**: Runtime varies based on:
 > - Number of K-fold iterations (default: 5)
